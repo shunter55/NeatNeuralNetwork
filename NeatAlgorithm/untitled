@@ -1,0 +1,6 @@
+
+Util {
+	var random = function(start, end) {
+		Math.floor(Math.random() * (end + 1))
+	}
+}
