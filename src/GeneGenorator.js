@@ -19,12 +19,12 @@ geneConstants = {
 		splitConnection: 0.3
 	},
 	weight = {
-		// Lower bound of how much a weight mutation can be.
-		changeLower = 0.1;
-		// Upper bound of how much a weight mutation can be.
-		changeUpper = 0.25;
 		// Chance that a weight mutation will occur.
-		chance = 0.3;
+		chance = 0.3,
+		// Lower bound of how much a weight mutation can be.
+		changeLower = 0.1,
+		// Upper bound of how much a weight mutation can be.
+		changeUpper = 0.25
 	}
 }
 
