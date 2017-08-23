@@ -38,10 +38,10 @@ class Genome {
 	copy() {
 		var newGenome = new Genome();
 		nodeGenes.forEach(function (nodeGene) {
-			newGenome.addNodeGene(nodeGene);
+			newGenome.addNodeGene(nodeGene.copy());
 		});
 		connectionGenes.forEach(function (connGene) {
-			newGenome.addConnectionGene(connGene);
+			newGenome.addConnectionGene(connGene.copy());
 		});
 		return newGenome;
 	}

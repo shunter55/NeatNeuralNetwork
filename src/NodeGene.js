@@ -7,6 +7,12 @@ class NodeGene {
 		// idx must be valid for an output node.
 		this.idx = null;
 	}
+
+	copy() {
+		var node = new NodeGene(this.id, this.nodeType);
+		node.idx = this.idx;
+		return node;
+	}
 }
 
 module.exports = NodeGene;

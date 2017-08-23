@@ -22,7 +22,7 @@ var geneConstants = {
 		// Chance that a weight mutation will occur.
 		chance = 0.3,
 		// Lower bound of how much a weight mutation can be.
-		changeLower = 0.1,
+		changeLower = 0.05,
 		// Upper bound of how much a weight mutation can be.
 		changeUpper = 0.25
 	}
@@ -84,9 +84,9 @@ class GeneGenorator {
 			var newNode = createGene.hidden(this.innovNumber++);
 
 			var connA = createGene.connection(this.innovNumber++, connToSplit.inId, newNode.id);
-			connA.weight = 1;
+			connA.setWeight(1);
 			var connB = createGene.connection(this.innovNumber++, newNode.id, connToSplit.outId);
-			connB.weight = connToSplit.weight;
+			connB.setWeight(connToSplit.weight);
 
 			newGenome.addNodeGene(newNode);
 			newGenome.addNodeGene(connA);
@@ -110,11 +110,23 @@ class GeneGenorator {
 		newGenome.connections.forEach(function(connection) {
 			// If should mutate weight.
 			if (Math.random() < geneConstants.weight.chance) {
-				connection.weight = Util.randomFloat(geneConstants.weight.changeLower, geneConstants.weight.changeUpper);
+				var dir = 1;
+				if (Math.random < 0.5) {
+					dir = -1;
+				}
+				var weightChange = Util.randomFloat(geneConstants.weight.changeLower, geneConstants.weight.changeUpper) * dir;
+				connection.setWeight(connection.weight + weightChange);
 			}
 		});
 
 		return newGenome;
+	}
+
+	/**
+	 *	Create a new genome by mating two genomes.
+	 */
+	mateGenomes(genomeA, genomeB, fitnessA, fitnessB) {
+
 	}
 
 }
