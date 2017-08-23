@@ -1,7 +1,7 @@
 const Util = require('./Util');
 
 NodeType = {
-	sensor: 0,
+	input: 0,
 	hidden: 1,
 	output: 2,
 	random: function() {
