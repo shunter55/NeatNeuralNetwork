@@ -5,7 +5,7 @@ const ConnectionGene = require('./ConnectionGene');
 const Organism = require('./Organism');
 const Genome = require('./Genome');
 
-geneConstants = {
+var geneConstants = {
 	node = {
 		// Chance that an input gene will be created.
 		input: 0.3,
