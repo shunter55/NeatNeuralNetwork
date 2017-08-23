@@ -1,17 +1,17 @@
 
 Util = {
 	/**
-	 *	Returns a random number between start and end inclusive.
+	 *	Returns a random Integer between min and max inclusive.
 	 */
-	random: function(start, end) {
-		return Math.floor(Math.random() * (end - start + 1)) + start
+	randomInt: function(min, max) {
+		return Math.floor(Math.random() * (max - min + 1)) + min
 	},
 
 	/**
-	 *	Return a random number between decimals start and end inclusive.
+	 *	Return a random Float between min and max inclusive.
 	 */
-	randomFloat: function(start, end) {
-		return Math.random() * (end - start) + start;
+	randomFloat: function(min, max) {
+		return Math.random() * (max - min) + min;
 	}
 }
 

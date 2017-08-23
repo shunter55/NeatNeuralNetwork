@@ -5,7 +5,7 @@ NodeType = {
 	hidden: 1,
 	output: 2,
 	random: function() {
-		Util.random(0, 2);
+		Util.randomInt(0, 2);
 	}
 }
 

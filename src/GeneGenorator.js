@@ -31,9 +31,6 @@ geneConstants = {
 class GeneGenorator {
 	constructor() {
 		this.innovNumber = 0;
-
-		this.nodeGenes = [];
-		this.connectionGenes = [];
 	}
 
 	/**
@@ -125,13 +122,13 @@ class GeneGenorator {
 var createGene = {
 	input = function(innovNumber, maxInputCount) {
 		var nodeGene = new NodeGene(innovNumber, NodeType.input);
-		nodeGene.idx = Util.random(0, maxInputCount - 1);
+		nodeGene.idx = Util.randomInt(0, maxInputCount - 1);
 		return nodeGene;
 	},
 
 	output = function(innovNumber, maxOutputCount) {
 		var nodeGene = new NodeGene(innovNumber, NodeType.output);
-		nodeGene.idx = Util.random(0, maxOutputCount - 1);
+		nodeGene.idx = Util.randomInt(0, maxOutputCount - 1);
 
 		return nodeGene;
 	},
@@ -147,12 +144,12 @@ var createGene = {
 
 var geneUtil = {
 	getRandomNode = function(genome) {
-		var idx = Util.random(0, genome.nodeGenes.length - 1);
+		var idx = Util.randomInt(0, genome.nodeGenes.length - 1);
 		return genome.nodeGenes[idx];
 	},
 
 	getRandomConnection = function(genome) {
-		var idx = Util.random(0, genome.connectionGenes.length - 1);
+		var idx = Util.randomInt(0, genome.connectionGenes.length - 1);
 		return genome.connectionGenes[idx];
 	},
 
@@ -168,13 +165,4 @@ var geneUtil = {
 
 module.exports = GeneGenorator;
 
-
-
-
-var generator = new GeneGenorator();
-
-var o = new Organism(new Genome());
-generator.mutateNewInputNodeGene(o);
-
-console.log(o);
 
