@@ -1,12 +1,9 @@
 const Util = require('./Util');
 
 NodeType = {
-	input: 0,
-	hidden: 1,
-	output: 2,
-	random: function() {
-		Util.randomInt(0, 2);
-	}
+	input: "in",
+	hidden: "hidden",
+	output: "out",
 }
 
 module.exports = NodeType;

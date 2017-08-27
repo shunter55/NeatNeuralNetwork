@@ -5,14 +5,22 @@ class Genome {
 		// All Genes used to create the Organism initially.
 		this.nodeGenes = [];
 		this.connectionGenes = [];
+		// All the innovation numbers of the Genes that appear in this Genome.
+		this.innovNums = {};
 	}
 
 	// ADD GENES.
 	addNodeGene(nodeGene) {
-		this.nodeGenes.push(nodeGene);
+		if (this.innovNums[nodeGene.id] == undefined) {
+			this.nodeGenes.push(nodeGene);
+			this.innovNums[nodeGene.id] = true;
+		}
 	}
 	addConnectionGene(connectionGene) {
-		this.connectionGenes.push(this.connectionGenes);
+		if (this.innovNums[connectionGene.innovNum] == undefined) {
+			this.connectionGenes.push(connectionGene);
+			this.innovNums[connectionGene.innovNum] = true;
+		}
 	}
 
 	// Save to json.
@@ -37,18 +45,15 @@ class Genome {
 	// Returns a new copy of the genome.
 	copy() {
 		var newGenome = new Genome();
-		nodeGenes.forEach(function (nodeGene) {
+		this.nodeGenes.forEach(function (nodeGene) {
 			newGenome.addNodeGene(nodeGene.copy());
 		});
-		connectionGenes.forEach(function (connGene) {
+		this.connectionGenes.forEach(function (connGene) {
 			newGenome.addConnectionGene(connGene.copy());
 		});
 		return newGenome;
 	}
 }
-
-
-
 
 module.exports = Genome;
 
