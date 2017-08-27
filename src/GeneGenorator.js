@@ -31,6 +31,13 @@ var geneConstants = {
 	mate: {
 		// Chance that genes will appear in offspring.
 		crossover: 0.5
+	},
+	speciation: {
+		compatibilityDistThreshold: 3,
+		excessWeight: 0.3,
+		disjointWeight: 0.3,
+		weightWeight: 0.3,
+		normalizingFactor: 1
 	}
 }
 
@@ -143,24 +150,24 @@ class GeneGenorator {
 	 */
 	mateGenomes(genomeA, genomeB, fitnessA, fitnessB) {
 		var newGenome = new Genome();
-		genomeA.nodeGenes.map(function(node) {
+		genomeA.nodeGenes.forEach(function(node) {
 			newGenome.addNodeGene(node);
 		});
-		genomeB.nodeGenes.map(function(node) {
+		genomeB.nodeGenes.forEach(function(node) {
 			newGenome.addNodeGene(node);
 		});
 
 		if (fitnessA == fitnessB) {
 			// Add all disjoint and excess genes.
 			var connGenes = {};
-			genomeA.connectionGenes.map(function(connection) {
+			genomeA.connectionGenes.forEach(function(connection) {
 				if (genomeB.innovNums[connection.innovNum] != undefined) {
 					connGenes[connection.innovNum] = connection;
 				} else if (Math.random() > geneConstants.mate.crossover) {
 					connGenes[connection.innovNum] = connection;
 				}
 			});
-			genomeB.connectionGenes.map(function(connection) {
+			genomeB.connectionGenes.forEach(function(connection) {
 				if (connGenes[connection.innovNum] != undefined) {
 					if (Math.random() > geneConstants.mate.crossover) {
 						connGenes[connection.innovNum] = connection;
@@ -178,10 +185,10 @@ class GeneGenorator {
 			var strongGenome = fitnessA > fitnessB ? genomeA : genomeB;
 			var weakGenome = fitnessA < fitnessB ? genomeA : genomeB;
 			var connGenes = {};
-			weakGenome.connectionGenes.map(function(connection) {
+			weakGenome.connectionGenes.forEach(function(connection) {
 				connGenes[connection.innovNum] = connection;
 			});
-			strongGenome.connectionGenes.map(function(connection) {
+			strongGenome.connectionGenes.forEach(function(connection) {
 				if (connGenes[connection.innovNum] != undefined) {
 					newGenome.addConnectionGene(Math.random() > 0.5 ? connGenes[connection.innovNum] : connection);
 				} else {
@@ -271,6 +278,83 @@ var geneUtil = {
 	}
 }
 
+var speciateUtil = {
+	compatibilityDist: function(genomeA, genomeB) {
+		var ed = this.getExcessAndDisjoint(genomeA, genomeB);
+		var m = this.getMatching(genomeA, genomeB);
+		var avgWeightDiff = 0;
+		for (var i = 0; i < m.A.length; i++) {
+			avgWeightDiff += Math.abs(m.A[i] - m.B[i]);
+		}
+		avgWeightDiff /= m.A.length;
+
+		return speciation.excessWeight * ed.excess.length / speciation.normalizingFactor +
+			   speciation.disjointWeight * ed.disjoint.length / speciation.normalizingFactor +
+			   speciation.weightWeight * avgWeightDiff;
+	},
+
+	getMatching: function(genomeA, genomeB) {
+		var union = {A: [], B: []};
+
+		genomeA.connectionGenes.forEach(function(connection) {
+			if (genomeB.innovNums[connection.innovNum] != undefined) {
+				union.A.push(connection);
+			}
+		});
+		genomeB.connectionGenes.forEach(function(connection) {
+			if (genomeA.innovNums[connection.innovNum] != undefined) {
+				union.B.push(connection);
+			}
+		});
+	
+		return union;
+	},
+
+	getExcessAndDisjoint: function(genomeA, genomeB) {
+		// Get intersection of connection Genes.
+		var intersectionA = [];
+		var intersectionB = [];
+		var maxA = -1;
+		var minA = Number.MAX_SAFE_INTEGER;
+		var maxB = -1;
+		var minB = Number.MAX_SAFE_INTEGER;
+		genomeA.connectionGenes.forEach(function(connection) {
+			if (genomeB.innovNums[connection.innovNum] == undefined) {
+				intersectionA.push(connection);
+			}
+			maxA = connection.innovNum > maxA ? connection.innovNum : maxA;
+			minA = connection.innovNum < minA ? connection.innovNum : minA;
+		});
+		genomeB.connectionGenes.forEach(function(connection) {
+			if (genomeA.innovNums[connection.innovNum] == undefined) {
+				intersectionB.push(connection);
+			}
+			maxB = connection.innovNum > maxB ? connection.innovNum : maxB;
+			minB = connection.innovNum < minB ? connection.innovNum : minB;
+		});
+
+		// Get excess Connections and disjoint Connections.
+		var excess = [];
+		var disjoint = [];
+		intersectionA.forEach(function(connection) {
+			if (connection.innovNum > maxB || connection.innovNum < minB) {
+				excess.push(connection);
+			} else {
+				disjoint.push(connection);
+			}
+		});
+		intersectionB.forEach(function(connection) {
+			if (connection.innovNum > maxA || connection.innovNum < minA) {
+				excess.push(connection);
+			} else {
+				disjoint.push(connection);
+			}
+		});
+
+		return {excess: excess, disjoint: disjoint};
+	}
+}
+
 module.exports = GeneGenorator;
 
 
@@ -343,19 +427,53 @@ var Tests = {
 		console.log(genomeC);
 	},
 
+	excessDisjointTest: function() {
+		var connection1 = new ConnectionGene(0, 1, 0);
+		var connection2 = new ConnectionGene(1, 2, 1);
+		var connection3 = new ConnectionGene(2, 3, 2);
+		var connection4 = new ConnectionGene(3, 5, 3);
+
+		var genomeA = new Genome();
+		genomeA.addConnectionGene(connection2);
+		genomeA.addConnectionGene(connection4);
+		var genomeB = new Genome();
+		genomeB.addConnectionGene(connection1);
+		genomeB.addConnectionGene(connection3);
+
+		console.log(speciateUtil.getExcessAndDisjoint(genomeA, genomeB));
+	},
+
+	matchingTest: function() {
+		var connection1 = new ConnectionGene(0, 1, 0);
+		var connection2A = new ConnectionGene(1, 2, 1);
+		var connection2B = new ConnectionGene(1, 2, 1);
+		var connection3 = new ConnectionGene(2, 3, 2);
+		var connection4 = new ConnectionGene(3, 5, 3);
+
+		var genomeA = new Genome();
+		genomeA.addConnectionGene(connection2A);
+		genomeA.addConnectionGene(connection4);
+		var genomeB = new Genome();
+		genomeB.addConnectionGene(connection1);
+		genomeB.addConnectionGene(connection3);
+		genomeB.addConnectionGene(connection2B);
+
+		console.log(speciateUtil.getMatching(genomeA, genomeB));
+	},
+
 	runAll: function() {
 		this.createGeneTests();
 		//this.createGenomeTest();
 		//this.mutateGenomeTest();
+		//this.mateGenomesStrongerTest();
 		//this.mateGenomesEqualTest();
+		//this.excessDisjointTest();
+		this.matchingTest();
 	}
 }
 
 
 Tests.runAll();
-
-
-
 
 
 
