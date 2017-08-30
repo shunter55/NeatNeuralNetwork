@@ -10,7 +10,6 @@ class Node {
 	calcValue() {
 		switch (this.type) {
 			case NodeType.input:
-				console.log(this);
 				if (this.value == null)
 					throw new Error("value cannot be null for input node.");
 				return this.value;
@@ -25,6 +24,10 @@ class Node {
 				}
 				return this.value;
 		}
+	}
+
+	setValue(value) {
+		this.value = value;
 	}
 
 	reset() {

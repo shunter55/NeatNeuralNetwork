@@ -70,16 +70,14 @@ class Organism {
 			this.maxInputCount = inputs.length;
 		}
 
-		// Set all the input node's values.
-		console.log(this.inputNodes)
-		for (var i = 0; i < this.inputNodes.length; i++) {
-			this.inputNodes[i].value = i < inputs.length ? inputs[i] : 0;
-			console.log(this.inputNodes[i])
-		}
-
 		var outputs = [];
 		// Reset nodes so they will calculate their values again with the new inputs.
 		this.resetNodes();
+
+		// Set all the input node's values.
+		for (var i = 0; i < this.inputNodes.length; i++) {
+			this.inputNodes[i].setValue(i < inputs.length ? inputs[i] : 0);
+		}
 
 		// Calculate Organism's values using its NeruralNetwork.
 		for (var i = 0; i < this.outputNodes.length; i++) {
@@ -88,7 +86,6 @@ class Organism {
 			if (outNode == null) {
 				outputs[i] = 0;
 			} else {
-				console.log(outNode.connections)
 				outputs[i] = outNode.calcValue();
 			}
 		}

@@ -6,7 +6,7 @@ class Connection {
 	}
 
 	calcValue() {
-		return this.inputNode.calcValue() * weight;
+		return this.inputNode.calcValue() * this.weight;
 	}
 }
 
