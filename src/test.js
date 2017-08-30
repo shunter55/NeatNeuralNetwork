@@ -1,16 +1,45 @@
 // equal, deepEqual, notEqual
 const Assert = require('assert')
 
+const Util = require('./Util');
 const NodeType = require('./NodeType');
-const Node = require('./NodeGene');
-const Connection = require('./ConnectionGene');
+const NodeGene = require('./NodeGene');
+const ConnectionGene = require('./ConnectionGene');
+const Organism = require('./Organism');
 const Genome = require('./Genome');
+const Species = require('./Species');
+const GeneGeneratior = require('./GeneGenorator');
 
-// Test add.
-var g = new Genome();
-var n = new Node(1, NodeType.sensor);
+var xorFitness = function(outputs) {
+	var scaler = 100;
+	return (scaler * (-outputs[0])) + (-scaler * (1 - outputs[1])) + (-scaler * (1 - outputs[2])) + (scaler * (-outputs[3]));
+}
 
-g.addNode(n);
+var Tests = {
+	testGeneGenerator: function() {
+		var generator = new GeneGeneratior();
 
-Assert.equal(g.nodeCount, 1);
+		// Create 25 Organisms.
+		var organisms = [];
+		for (var i = 0; i < 10; i++) {
+			organisms.push(new Organism(generator.createGenome(4, 4)));
+			organisms[i].generateNetwork(4);
+		}
 
+		// Get their outputs.
+		var inputs = [0, 1, 1, 0];
+		organisms.forEach(function(organism) {
+			var outputs = organism.getOutputs(inputs);
+			console.log(outputs)
+			var fitness = xorFitness(outputs);
+			console.log(i + ": " + outputs + " fitness: " + fitness);
+		});
+
+	},
+
+	testAll: function() {
+		this.testGeneGenerator();
+	}
+}
+
+Tests.testAll();

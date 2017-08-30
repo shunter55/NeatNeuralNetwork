@@ -1,3 +1,4 @@
+const NodeType = require('./NodeType');
 
 class Node {
 	constructor(nodeType) {
@@ -7,24 +8,33 @@ class Node {
 	}
 
 	calcValue() {
-		if (this.value == null) {
-			var total = 0;
-			connections.forEach(function (connection) {
-				total += connection.calcValue();
-			});
+		switch (this.type) {
+			case NodeType.input:
+				console.log(this);
+				if (this.value == null)
+					throw new Error("value cannot be null for input node.");
+				return this.value;
+			default:
+				if (this.value == null) {
+					var total = 0;
+					this.connections.forEach(function (connection) {
+						total += connection.calcValue();
+					});
 
-			this.value = Math.pow((1 + Math.exp(-total)), -1);
+					this.value = Math.pow((1 + Math.exp(-total)), -1);
+				}
+				return this.value;
 		}
-
-		return this.value;
 	}
 
 	reset() {
-		value = null;
+		this.value = null;
 	}
 
 	addInput(connection) {
-		connections.push(connection);
+		this.connections.push(connection);
 	}
 
 }
+
+module.exports = Node;

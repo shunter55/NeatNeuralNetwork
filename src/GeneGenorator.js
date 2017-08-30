@@ -6,6 +6,7 @@ const NodeGene = require('./NodeGene');
 const ConnectionGene = require('./ConnectionGene');
 const Organism = require('./Organism');
 const Genome = require('./Genome');
+const Species = require('./Species');
 
 var geneConstants = {
 	node: {
@@ -44,6 +45,7 @@ var geneConstants = {
 class GeneGenorator {
 	constructor() {
 		this.innovNumber = 0;
+		this.species = [];
 
 		// All the genes that have been created so far.
 		this.allGenes = {
@@ -55,6 +57,19 @@ class GeneGenorator {
 			connection: {},
 			// {in, out} -> id
 			splitConnection: {}
+		}
+	}
+
+	/**
+	 *	Start a new Generation.
+	 */
+	newGeneration() {
+		for (var i = 0; i < this.species.length; i++) {
+			if (s.genomes.length > 0) {
+				s.newRepresentative(s.genomes[Util.randomInt(0, s.genomes.length - 1)]);
+			} else {
+				s.species.splice(i--, 1);
+			}
 		}
 	}
 
@@ -198,6 +213,13 @@ class GeneGenorator {
 		}
 
 		return newGenome;
+	}
+
+	/**
+	 *	Place the genome into its proper species.
+	 */
+	speciate(genome) {
+
 	}
 
 }
@@ -473,7 +495,7 @@ var Tests = {
 }
 
 
-Tests.runAll();
+//Tests.runAll();
 
 
 

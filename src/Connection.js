@@ -1,11 +1,13 @@
 
 class Connection {
 	constructor(inputNode, weight) {
-		this.inputNode = input;
+		this.inputNode = inputNode;
 		this.weight = weight;
 	}
 
 	calcValue() {
-		return inputNode.calcValue()*weight;
+		return this.inputNode.calcValue() * weight;
 	}
 }
+
+module.exports = Connection;

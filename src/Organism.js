@@ -14,10 +14,8 @@ class Organism {
 		this.nodes = null;
 		// All the Organism's output nodes. Length is fixed upon creation. Nonexistant nodes are set to null.
 		this.outputNodes = null;
-
-		// VARIABLE changes with each call of getOutputs. Used to calculate the outputs.
-		// Array of numerical values.
-		this.organismInputs = null;
+		// All the Organism's input nodes.
+		this.inputNodes = null;
 	}
 
 	// BIRTH ORGANISM. (Creates organism from genes)
@@ -33,58 +31,64 @@ class Organism {
 		// All the nodes the organism has.
 		this.nodes = {};
 
+		this.inputNodes = [];
 		// CREATE all the Nodes from Organism's NodeGenes.
-		nodeGenes.forEach(function (nodeGene) {
+		for (var i = 0; i < this.genome.nodeGenes.length; i++) {
+			var nodeGene = this.genome.nodeGenes[i];
 			var node = new Node(nodeGene.type);
 			
 			// IF input node.
 			if (nodeGene.type == NodeType.input) {
-				// GET the value from the Organism's inputs.
-				node.calcValue = function() {
-					if (nodeGene.idx < organismInputs.length && nodeGene.inputIdx >= 0)
-						return organismInputs[nodeGene.inputIdx];
-					return 0;
-				}
+				// Get all Organism's inputs.
+				this.inputNodes.push(node);
 			}
 			// IF output node.
 			if (nodeGene.type == NodeType.output) {
 				// ASSOCIATE the output with Organism's outputs.
-				outputNodes[nodeGene.idx] = node;
+				this.outputNodes[nodeGene.idx] = node;
 			}
-
-			nodes[nodeGene.id] = node
-		});
+			this.nodes[nodeGene.id] = node
+		};
 
 		// ADD connections to nodes from genes.
-		connectionGenes.forEach(function (connectionGene) {
+		for (var i = 0; i < this.genome.connectionGenes.length; i++) {
+			var connectionGene = this.genome.connectionGenes[i];
 			// IF the gene is enabled.
 			if (connectionGene.enabled) {
 				// ADD the connection to the node.
-				var connection = new Connection(nodes[connectionGene.inId], connectionGene.weight);
-				nodes[connectionGene.outId].addInput(connection);
+				var connection = new Connection(this.nodes[connectionGene.inId], connectionGene.weight);
+				this.nodes[connectionGene.outId].addInput(connection);
 			}
-		});
+		};
 	}
 
 	// Have the Organism calculate its outputs.
 	// inputs - array of numerical values of variable size that the organism will use to calculate its outputs.
 	// returns an array of outputs. (fixed length)
 	getOutputs(inputs) {
-		if (inputs.length > maxInputCount) {
-			maxInputCount = inputs.length;
+		if (inputs.length > this.maxInputCount) {
+			this.maxInputCount = inputs.length;
+		}
+
+		// Set all the input node's values.
+		console.log(this.inputNodes)
+		for (var i = 0; i < this.inputNodes.length; i++) {
+			this.inputNodes[i].value = i < inputs.length ? inputs[i] : 0;
+			console.log(this.inputNodes[i])
 		}
 
 		var outputs = [];
 		// Reset nodes so they will calculate their values again with the new inputs.
-		resetNodes();
+		this.resetNodes();
 
 		// Calculate Organism's values using its NeruralNetwork.
-		this.organismInputs = inputs;
-		for (var i = 0; i < outputNodes; i++) {
-			var outNode = outputNodes[i];
+		for (var i = 0; i < this.outputNodes.length; i++) {
+			var outNode = this.outputNodes[i];
+
 			if (outNode == null) {
 				outputs[i] = 0;
 			} else {
+				console.log(outNode.connections)
 				outputs[i] = outNode.calcValue();
 			}
 		}
@@ -95,9 +99,10 @@ class Organism {
 
 	// Reset nodes so they will calculate their values again for new inputs.
 	resetNodes() {
-		this.nodes.map(function (node) {
-			node.reset();
-		});
+		var keys = Object.keys(this.nodes);
+		for (var i = 0; i < keys.length; i++) {
+			this.nodes[keys[i]].reset();
+		}
 	}
 
 	// Returns a copy of the organism.
