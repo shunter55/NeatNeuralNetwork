@@ -119,31 +119,28 @@ class GeneGenorator {
 		// If should split connection.
 		if (Math.random() < geneConstants.connection.splitConnection) {
 			var connToSplit = geneUtil.getRandomConnection(genome);
-			connToSplit.setEnabled(false);
+			if (connToSplit != undefined) {
+				connToSplit.setEnabled(false);
 
-			var newNode = createGene.hidden(this);
+				var newNode = createGene.hidden(this, connToSplit);
 
-			var connA = createGene.connection(this, connToSplit.inId, newNode.id);
-			connA.setWeight(1);
-			var connB = createGene.connection(this, newNode.id, connToSplit.outId);
-			connB.setWeight(connToSplit.weight);
+				var connA = createGene.connection(this, connToSplit.inId, newNode.id);
+				connA.setWeight(1);
+				var connB = createGene.connection(this, newNode.id, connToSplit.outId);
+				connB.setWeight(connToSplit.weight);
 
-			newGenome.addNodeGene(newNode);
-			newGenome.addNodeGene(connA);
-			newGenome.addNodeGene(connB);
+				newGenome.addNodeGene(newNode);
+				newGenome.addConnectionGene(connA);
+				newGenome.addConnectionGene(connB);
+			}
 		}
 		// If should create new connection.
 		if (Math.random() < geneConstants.connection.create) {
 			var nodeA = geneUtil.getRandomNode(genome);
 			var nodeB = geneUtil.getRandomNode(genome);
 
-			while(geneUtil.connectionExists(genome, nodeA.id, nodeB.id)) {
-				nodeA = geneUtil.getRandomNode(genome);
-				nodeB = geneUtil.getRandomNode(genome);
-			}
-
-			var newConnection = geneUtil.connection(innovNumber++, nodeA.id, nodeB.id);
-			newGenome.addNodeGene(newConnection);
+			var newConnection = createGene.connection(this, nodeA.id, nodeB.id)
+			newGenome.addConnectionGene(newConnection);
 		}
 
 		// Mutate weights.

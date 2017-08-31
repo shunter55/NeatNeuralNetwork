@@ -15,6 +15,7 @@ class Node {
 				return this.value;
 			default:
 				if (this.value == null) {
+					this.value = 1;
 					var total = 0;
 					this.connections.forEach(function (connection) {
 						total += connection.calcValue();

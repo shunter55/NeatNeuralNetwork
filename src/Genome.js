@@ -11,12 +11,18 @@ class Genome {
 
 	// ADD GENES.
 	addNodeGene(nodeGene) {
+		if (nodeGene.id == undefined)
+			throw new Error("not a node gene");
+
 		if (this.innovNums[nodeGene.id] == undefined) {
 			this.nodeGenes.push(nodeGene);
 			this.innovNums[nodeGene.id] = true;
 		}
 	}
 	addConnectionGene(connectionGene) {
+		if (connectionGene.innovNum == undefined)
+			throw new Error("not a connection gene");
+
 		if (this.innovNums[connectionGene.innovNum] == undefined) {
 			this.connectionGenes.push(connectionGene);
 			this.innovNums[connectionGene.innovNum] = true;

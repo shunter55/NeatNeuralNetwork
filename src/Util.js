@@ -16,4 +16,3 @@ Util = {
 }
 
 module.exports = Util;
-

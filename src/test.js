@@ -26,14 +26,49 @@ var Tests = {
 			organisms[i].generateNetwork(4);
 		}
 
-		// Get their outputs.
-		var inputs = [0, 1, 1, 0];
-		organisms.forEach(function(organism) {
+		for (var generation = 0; generation < 30; generation++) {
+			// Get their outputs.
+			var inputs = [0, 1, 1, 0];
+			organisms.forEach(function(organism, i) {
+				var outputs = organism.getOutputs(inputs);
+				var fitness = xorFitness(outputs);
+				organism.fitness = fitness;
+				//console.log("fitness: " + fitness + " : " + outputs);
+			});
+
+			// sort organisms by fitness.
+			var sortFunction = function(a, b) {
+				if (a.fitness == b.fitness)
+					return 0;
+				if (a.fitness < b.fitness)
+					return 1;
+				if (a.fitness > b.fitness)
+					return -1;
+			}
+
+			organisms.sort(sortFunction);
+
+			var children = [];
+			for (var i = 0; i < 5; i++) {
+				for (var j = i + 1; j < 5; j++) {
+					var newGenome = generator.mateGenomes(organisms[i].genome, organisms[j].genome);
+					newGenome = generator.mutateGenome(newGenome, 4, 4);
+					var child = new Organism(newGenome);
+
+					child.generateNetwork(4);
+					children.push(child);
+				}
+			}
+			organisms = children;
+		}
+
+		organisms.forEach(function(organism, i) {
 			var outputs = organism.getOutputs(inputs);
-			console.log(outputs)
 			var fitness = xorFitness(outputs);
-			console.log(i + ": " + outputs + " fitness: " + fitness);
+			organism.fitness = fitness;
+			console.log("fitness: " + fitness + " : " + outputs);
 		});
+		
 
 	},
 
@@ -41,5 +76,7 @@ var Tests = {
 		this.testGeneGenerator();
 	}
 }
+
+
 
 Tests.testAll();

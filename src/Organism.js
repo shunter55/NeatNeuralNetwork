@@ -47,6 +47,7 @@ class Organism {
 				// ASSOCIATE the output with Organism's outputs.
 				this.outputNodes[nodeGene.idx] = node;
 			}
+
 			this.nodes[nodeGene.id] = node
 		};
 

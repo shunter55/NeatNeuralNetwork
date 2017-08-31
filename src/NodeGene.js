@@ -6,10 +6,13 @@ class NodeGene {
 		// Only for input/output genes. The index in an organism's inputs/outputs that should be used.
 		// idx must be valid for an output node.
 		this.idx = null;
+
+		if (nodeType == undefined)
+			throw new Error("nodeType cannot be undefined");
 	}
 
 	copy() {
-		var node = new NodeGene(this.id, this.nodeType);
+		var node = new NodeGene(this.id, this.type);
 		node.idx = this.idx;
 		return node;
 	}
