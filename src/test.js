@@ -9,6 +9,7 @@ const Organism = require('./Organism');
 const Genome = require('./Genome');
 const Species = require('./Species');
 const GeneGeneratior = require('./GeneGenorator');
+const Neat = require('./Neat');
 
 var xorFitness = function(outputs) {
 	var scaler = 100;
@@ -51,7 +52,7 @@ var Tests = {
 			var children = [];
 			for (var i = 0; i < 5; i++) {
 				for (var j = i + 1; j < 5; j++) {
-					var newGenome = generator.mateGenomes(organisms[i].genome, organisms[j].genome);
+					var newGenome = generator.mateGenomes(organisms[i].genome, organisms[j].genome, organisms[i].fitness, organisms[j].fitness);
 					newGenome = generator.mutateGenome(newGenome, 4, 4);
 					var child = new Organism(newGenome);
 
@@ -68,12 +69,40 @@ var Tests = {
 			organism.fitness = fitness;
 			console.log("fitness: " + fitness + " : " + outputs);
 		});
-		
+	},
 
+	testNeat: function() {
+		var numInGeneration = 10;
+		var numGenerations = 30;
+
+		Neat.setFitnessFunction(xorFitness)
+			.setNumInGeneration(numInGeneration)
+			.setMatingNum(3)
+			.setStartingNumInputs(4)
+			.setNumOutputs(4);
+
+		var inputs = [0, 1, 1, 0];
+		var generationInputs = [];
+		for (var i = 0; i < numInGeneration; i++) {
+			generationInputs.push(inputs);
+		}
+
+		for (var i = 0; i < numGenerations; i++) {
+			Neat.startNextGeneration();
+			var outputs = Neat.getOutputs(generationInputs);
+		}
+
+		Neat.startNextGeneration();
+		var outputs = Neat.getOutputs(generationInputs);
+		var data = Neat.getData();
+		data.forEach(function (data) {
+			console.log(data);
+		});
 	},
 
 	testAll: function() {
-		this.testGeneGenerator();
+		//this.testGeneGenerator();
+		this.testNeat();
 	}
 }
 

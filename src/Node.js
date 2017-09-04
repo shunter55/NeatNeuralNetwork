@@ -21,7 +21,7 @@ class Node {
 						total += connection.calcValue();
 					});
 
-					this.value = Math.pow((1 + Math.exp(-total)), -1);
+					this.value = 2 * Math.pow((1 + Math.exp(-total)), -1) - 1;
 				}
 				return this.value;
 		}

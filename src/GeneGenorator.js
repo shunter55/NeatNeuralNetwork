@@ -11,23 +11,25 @@ const Species = require('./Species');
 var geneConstants = {
 	node: {
 		// Chance that an input gene will be created.
-		input: 0.3,
+		input: 0.1,
 		// Chance that an output gene will be created.
-		output: 0.3
+		output: 0.1
 	},
 	connection: {
 		// Chance that a connection gene will be created.
 		create: 0.1,
 		// Chance that a connection will be split.
-		splitConnection: 0.3
+		splitConnection: 0.1,
+		// Chance that a connection will be disabled.
+		disable: 0.1
 	},
 	weight: {
 		// Chance that a weight mutation will occur.
-		chance: 0.3,
+		chance: 0.2,
 		// Lower bound of how much a weight mutation can be.
 		changeLower: 0.05,
 		// Upper bound of how much a weight mutation can be.
-		changeUpper: 0.25
+		changeUpper: 0.15
 	},
 	mate: {
 		// Chance that genes will appear in offspring.
@@ -143,6 +145,13 @@ class GeneGenorator {
 			newGenome.addConnectionGene(newConnection);
 		}
 
+		// If some connections should be disabled.
+		newGenome.connectionGenes.forEach(function(connection) {
+			if (Math.random() < geneConstants.connection.disable) {
+				connection.setEnabled(false);
+			}
+		});
+
 		// Mutate weights.
 		newGenome.connectionGenes.forEach(function(connection) {
 			// If should mutate weight.
@@ -215,9 +224,9 @@ class GeneGenorator {
 	/**
 	 *	Place the genome into its proper species.
 	 */
-	speciate(genome) {
-
-	}
+	//speciate(genome) {
+	//
+	//}
 
 }
 
@@ -297,7 +306,36 @@ var geneUtil = {
 	}
 }
 
+
 var speciateUtil = {
+	// Returns the species in speciesList that the organism should be added to. null if does not match any.
+	getSpecies: function(genome) {
+		for (var i = 0; i < this.speciesList.length; i++) {
+			var species = this.speciesList[i];
+
+			if (this.compatibilityDist(species.representative, genome) < compatibilityThreshold)
+				return species;
+		}
+		return null;
+	},
+
+	addSpecies: function(genome) {
+		var species = this.getSpecies(genome);
+		if (species == null) {
+			var newSpecies = {"representative": genome, "genomes": [genome]};
+			this.speciesList.push(newSpecies);
+		}
+		else {
+			species.genomes.push(genome);
+		}
+	},
+
+	speciate: function(genome) {
+		this.speciesList.forEach(function(species) {
+
+		});
+	},
+
 	compatibilityDist: function(genomeA, genomeB) {
 		var ed = this.getExcessAndDisjoint(genomeA, genomeB);
 		var m = this.getMatching(genomeA, genomeB);
@@ -337,6 +375,7 @@ var speciateUtil = {
 		var minA = Number.MAX_SAFE_INTEGER;
 		var maxB = -1;
 		var minB = Number.MAX_SAFE_INTEGER;
+
 		genomeA.connectionGenes.forEach(function(connection) {
 			if (genomeB.innovNums[connection.innovNum] == undefined) {
 				intersectionA.push(connection);
@@ -351,6 +390,9 @@ var speciateUtil = {
 			maxB = connection.innovNum > maxB ? connection.innovNum : maxB;
 			minB = connection.innovNum < minB ? connection.innovNum : minB;
 		});
+
+		console.log(intersectionA)
+		console.log(intersectionB)
 
 		// Get excess Connections and disjoint Connections.
 		var excess = [];
@@ -373,6 +415,7 @@ var speciateUtil = {
 		return {excess: excess, disjoint: disjoint};
 	}
 }
+
 
 module.exports = GeneGenorator;
 
@@ -462,6 +505,32 @@ var Tests = {
 		console.log(speciateUtil.getExcessAndDisjoint(genomeA, genomeB));
 	},
 
+	excessDisjointTest2: function() {
+		var connection1 = new ConnectionGene(0, 1, 0); // e
+		var connection2 = new ConnectionGene(1, 2, 1); // m
+		var connection3 = new ConnectionGene(2, 3, 2); // m
+		var connection4 = new ConnectionGene(3, 5, 3); // d
+		var connection5 = new ConnectionGene(4, 5, 4); // d
+		var connection6 = new ConnectionGene(5, 5, 5); // d
+		var connection7 = new ConnectionGene(6, 5, 6); // d
+		var connection8 = new ConnectionGene(7, 5, 7); // e
+
+		var genomeA = new Genome();
+		genomeA.addConnectionGene(connection2); // m
+		genomeA.addConnectionGene(connection3); // m
+		genomeA.addConnectionGene(connection4); // d
+		genomeA.addConnectionGene(connection7); // d
+		var genomeB = new Genome();
+		genomeB.addConnectionGene(connection1); // e
+		genomeB.addConnectionGene(connection2); // m
+		genomeB.addConnectionGene(connection3); // m
+		genomeB.addConnectionGene(connection5); // d
+		genomeB.addConnectionGene(connection6); // d
+		genomeB.addConnectionGene(connection8); // e
+
+		console.log(speciateUtil.getExcessAndDisjoint(genomeA, genomeB));
+	},
+
 	matchingTest: function() {
 		var connection1 = new ConnectionGene(0, 1, 0);
 		var connection2A = new ConnectionGene(1, 2, 1);
@@ -487,10 +556,10 @@ var Tests = {
 		//this.mateGenomesStrongerTest();
 		//this.mateGenomesEqualTest();
 		//this.excessDisjointTest();
+		//this.excessDisjointTest2();
 		this.matchingTest();
 	}
 }
-
 
 //Tests.runAll();
 

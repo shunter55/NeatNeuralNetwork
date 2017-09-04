@@ -1,0 +1,43 @@
+const Util = require('./Util');
+const NodeType = require('./NodeType');
+const NodeGene = require('./NodeGene');
+const ConnectionGene = require('./ConnectionGene');
+const Organism = require('./Organism');
+const Genome = require('./Genome');
+const Species = require('./Species');
+const GeneGeneratior = require('./GeneGenorator');
+
+class GenerationManager {
+	constructor() {
+		// The fitness function to use.
+		this.fitnessFunction = null;
+		// The number of organisms in each generation.
+		this.numInGeneration = null;
+		// How many organisms to mate.
+		this.matingNum = null;
+
+		// The current generation.
+		this.generation = 0;
+	}
+
+	setFitnessFunction(func) {
+		this.fitnessFunction = func;
+		return this;
+	}
+
+	setNumInGeneration(num) {
+		this.numInGeneration = num;
+		return this;
+	}
+
+	setMatingNum(num) {
+		this.matingNum = num;
+		return this;
+	}
+
+	getGeneration() {
+		return 
+	}
+}
+
+var Neat = new GenerationManager();
