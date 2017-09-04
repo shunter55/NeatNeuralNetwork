@@ -29,11 +29,15 @@ class GenerationManager {
 		this.startingNumInputs = 4;
 		// Num outputs
 		this.numOutputs = 4;
+		// Number of the most fit of all time to keep.
+		this.elitism = 1;
 
 		// The current generation.
 		this.generation = 0;
 		// The previous generation.
 		this.curGeneration = null;
+		// The most elite organisms so far.
+		this.elite = null;
 		// Generator
 		this.generator = new GeneGenerator();
 	}
@@ -63,6 +67,11 @@ class GenerationManager {
 		return this;
 	}
 
+	setElitism(num) {
+		this.elitism = num;
+		return this;
+	}
+
 	// Creates the next generation.
 	startNextGeneration() {
 		var organisms = [];
@@ -72,6 +81,11 @@ class GenerationManager {
 			for (var i = 0; i < this.numInGeneration; i++) {
 				organisms.push(new Organism(this.generator.createGenome(this.startingNumInputs, this.numOutputs)));
 				organisms[i].generateNetwork(this.numOutputs);
+			}
+
+			this.elite = [];
+			while(this.elite.length < this.elitism) {
+				this.elite.push(organisms[Util.randomInt(0, organisms.length - 1)]);
 			}
 		} 
 		// If any other gernaration.
@@ -85,8 +99,18 @@ class GenerationManager {
 
 			this.curGeneration.organisms.sort(sortFunction);
 
-			organisms.push(this.curGeneration.organisms[0]);
+			// Add elite organisms to generation.
+			var i = 0;
+			while (this.curGeneration.organisms[i].fitness > this.elite[this.elite.length - 1]) {
+				this.elite.push(this.curGeneration.organisms[i++]);
+				this.elite.sort(sortFunction);
+				this.elite.splice(-1);
+			}
+			this.elite.forEach(function(organism) {
+				organisms.push(organism);
+			});
 
+			// Mate offspring.
 			var i = 0;
 			var j = i + 1;
 			while (organisms.length < this.numInGeneration) {

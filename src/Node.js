@@ -21,7 +21,7 @@ class Node {
 						total += connection.calcValue();
 					});
 
-					this.value = 2 * Math.pow((1 + Math.exp(-total)), -1) - 1;
+					this.value = squashingFunction(total);
 				}
 				return this.value;
 		}
@@ -39,6 +39,10 @@ class Node {
 		this.connections.push(connection);
 	}
 
+}
+
+var squashingFunction = function(value) {
+	return 2 * Math.pow((1 + Math.exp(-value)), -1) - 1;
 }
 
 module.exports = Node;

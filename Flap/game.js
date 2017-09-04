@@ -22,7 +22,6 @@
 	window.setZeroTimeout = setZeroTimeout;
 })();
 
-var Neuvol;
 var game;
 var FPS = 60;
 var maxScore=0;
@@ -37,7 +36,8 @@ Neat.setFitnessFunction(function(organism, idx) {
 Neat.setNumInGeneration(NUM_PLAYERS)
    .setMatingNum(10)
    .setStartingNumInputs(2)
-   .setNumOutputs(1);
+   .setNumOutputs(1)
+   .setElitism(1);
 
 var speed = function(fps){
 	FPS = parseInt(fps);
@@ -201,6 +201,10 @@ Game.prototype.update = function(){
 				this.alives--;
 				//console.log(this.alives);
 				Neat.killOrganism(i);
+				if (this.alives == 1) {
+					console.log(Neat.curGeneration.organisms[i].genome)
+					console.log(Neat.curGeneration.organisms[i])
+				}
 				
 				if(this.isItEnd()){
 					this.start();

@@ -17,7 +17,6 @@ Util = {
 
 module.exports = Util;
 
-
-for (var i = 0; i < 10; i++) {
-	console.log(Math.random())
-}
+var arr = [1, 2, 3, 4]
+arr.splice(-1)
+console.log(arr)

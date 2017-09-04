@@ -35,7 +35,7 @@ class Organism {
 		// CREATE all the Nodes from Organism's NodeGenes.
 		for (var i = 0; i < this.genome.nodeGenes.length; i++) {
 			var nodeGene = this.genome.nodeGenes[i];
-			var node = new Node(nodeGene.type);
+			var node = new Node(nodeGene.type, nodeGene.inverted);
 			
 			// IF input node.
 			if (nodeGene.type == NodeType.input) {

@@ -12,7 +12,7 @@ class NodeGene {
 	}
 
 	copy() {
-		var node = new NodeGene(this.id, this.type);
+		var node = new NodeGene(this.id, this.nodeType);
 		node.idx = this.idx;
 		return node;
 	}

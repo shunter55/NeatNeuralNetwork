@@ -208,11 +208,11 @@ var geneConstants = {
 	},
 	connection: {
 		// Chance that a connection gene will be created.
-		create: 0.005,
+		create: 0.05,
 		// Chance that a connection will be split.
-		splitConnection: 0.005,
+		splitConnection: 0.05,
 		// Chance that a connection will be disabled.
-		disable: 0.0001
+		disable: 0.001
 	},
 	weight: {
 		// Chance that a weight mutation will occur.
@@ -624,13 +624,13 @@ var speciation = {
 	compatibilityThreshold: 3,
 	excessWeight: 1,
 	disjointWeight: 1,
-	weightWeight: 0.3,
+	weightWeight: 0.4,
 	normalizingFactor: 1
 }
 
 class GenerationManager {
 	constructor() {
-		// The fitness function to use. Takes an array of outputs from 0-1.
+		// The fitness function to use. Takes an organism and idx.
 		// Should return the most current fitness.
 		this.fitnessFunction = null;
 		// The number of organisms in each generation.
@@ -641,11 +641,15 @@ class GenerationManager {
 		this.startingNumInputs = 4;
 		// Num outputs
 		this.numOutputs = 4;
+		// Number of the most fit of all time to keep.
+		this.elitism = 1;
 
 		// The current generation.
 		this.generation = 0;
 		// The previous generation.
 		this.curGeneration = null;
+		// The most elite organisms so far.
+		this.elite = [];
 		// Generator
 		this.generator = new GeneGenerator();
 	}
@@ -675,6 +679,11 @@ class GenerationManager {
 		return this;
 	}
 
+	setElitism(num) {
+		this.elitism = num;
+		return this;
+	}
+
 	// Creates the next generation.
 	startNextGeneration() {
 		var organisms = [];
@@ -684,6 +693,11 @@ class GenerationManager {
 			for (var i = 0; i < this.numInGeneration; i++) {
 				organisms.push(new Organism(this.generator.createGenome(this.startingNumInputs, this.numOutputs)));
 				organisms[i].generateNetwork(this.numOutputs);
+			}
+
+			this.elite = [];
+			while(this.elite.length < this.elitism) {
+				this.elite.push(organisms[Util.randomInt(0, organisms.length - 1)]);
 			}
 		} 
 		// If any other gernaration.
@@ -697,8 +711,18 @@ class GenerationManager {
 
 			this.curGeneration.organisms.sort(sortFunction);
 
-			organisms.push(this.curGeneration.organisms[0]);
+			// Add elite organisms to generation.
+			var i = 0;
+			while (this.curGeneration.organisms[i].fitness > this.elite[this.elite.length - 1]) {
+				this.elite.push(this.curGeneration.organisms[i++]);
+				this.elite.sort(sortFunction);
+				this.elite.splice(-1);
+			}
+			this.elite.forEach(function(organism) {
+				organisms.push(organism);
+			});
 
+			// Mate offspring.
 			var i = 0;
 			var j = i + 1;
 			while (organisms.length < this.numInGeneration) {
@@ -781,7 +805,6 @@ class Speciate {
 
 	// Returns the species in speciesList that the organism should be added to. null if does not match any.
 	getSpecies(organism) {
-		//console.log(this.speciesList.length)
 		for (var i = 0; i < this.speciesList.length; i++) {
 			var species = this.speciesList[i];
 
